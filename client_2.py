@@ -1,8 +1,10 @@
 """
 client wants to attempt one single mcq
+copy of client.py
 """
 
 import socket
+# import time
 
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -11,8 +13,10 @@ client_socket.connect(('127.0.0.1', 5546))
 reply = client_socket.recv(1024).decode()
 print(reply)
 choice = input("Enter here: ")
+
 client_socket.send(choice.encode())
 
+# time.sleep(10)
 if choice == '3':
     print("Disconnecting from server...")
 

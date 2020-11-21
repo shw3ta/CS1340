@@ -1,10 +1,11 @@
 """
-server with no threading
+server with threading
 """
 
 import socket
 import getmac
 import datetime
+from threading import Thread
 
 
 def time_in_range(mode):
@@ -42,19 +43,8 @@ def count():
     return result
 
 
-answers = {}  # dictionary keyed by MAC, value = answer
-response = ''
-
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_socket.bind(('127.0.0.1', 5545))
-server_socket.listen()
-print(f"Quiz Server listening at port {5545}!")
-
-# server is always listening
-while True:
-    (csocket, address) = server_socket.accept()
-    ip = address[0]
-    port = address[1]
+def proc(csocket, ip):
+    response = ''
     mac = getmac.get_mac_address(ip=ip)
 
     welcome_message = "We are running a quiz. You can participate in the quiz any time between " \
@@ -103,3 +93,18 @@ while True:
     csocket.send(response.encode())
     print("Server disconnecting from socket...\nListening again...")
     csocket.close()
+
+
+answers = {}  # dictionary keyed by MAC, value = answer
+
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_socket.bind(('127.0.0.1', 5546))
+server_socket.listen()
+print(f"Quiz Server listening at port {5546}!")
+
+# server is always listening
+while True:
+    (csocket, address) = server_socket.accept()
+    ip = address[0]
+    port = address[1]
+    Thread(target=proc, args=(csocket, ip)).start()
